@@ -40,25 +40,31 @@ class QuicLoadBalancer(app_manager.OSKenApp):
         
         match = parser.OFPMatch()
         actions = [parser.OFPActionOutput(ofproto.OFPP_CONTROLLER, ofproto.OFPCML_NO_BUFFER)]
-        self.add_flow(self.datapath, 0, match, actions)
+        self.add_flow(self.datapath, 0, match, actions, inf_timeout=True)
         
         match_arp = parser.OFPMatch(eth_type=0x0806)
         actions_arp = [parser.OFPActionOutput(ofproto.OFPP_FLOOD)]
-        self.add_flow(self.datapath, 1, match_arp, actions_arp)
+        self.add_flow(self.datapath, 1, match_arp, actions_arp, inf_timeout=True)
         
         self.logger.info("Default Packet-In and ARP flood rules installed")
 
-    def add_flow(self, datapath, priority, match, actions):
+    def add_flow(self, datapath, priority, match, actions, inf_timeout = False):
         ofproto = datapath.ofproto
         parser = datapath.ofproto_parser
-        inst = [parser.OFPInstructionActions(ofproto.OFPIT_APPLY_ACTIONS, actions)]
-        
-        mod = parser.OFPFlowMod(
-            datapath=datapath, 
-            priority=priority,
-            idle_timeout=self.flow_idle_timeout, 
-            match=match, 
-            instructions=inst
+        inst = [parser.OFPInstructionActions(ofproto.OFPIT_APPLY_ACTIONS, actions,)]
+        if inf_timeout:
+            mod = parser.OFPFlowMod(
+                        datapath=datapath, 
+                        priority=priority,
+                        match=match, 
+                        instructions=inst)
+        else:
+            mod = parser.OFPFlowMod(
+                datapath=datapath, 
+                priority=priority,
+                idle_timeout=self.flow_idle_timeout, 
+                match=match, 
+                instructions=inst
         )
         datapath.send_msg(mod)
 

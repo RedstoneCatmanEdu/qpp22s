@@ -53,6 +53,10 @@ sudo dnf install openvswitch mininet golang
 
 2. Запустите скрипт автоматической настройки. Он установит необходимые Python-библиотеки (OS-Ken, pytest) и скомпилирует Go-бинарники в папку `bin/`.
 
+```bash
+./scripts/setup.sh
+```
+
 ## Запуск проекта
 
 Для запуска используются скрипты из папки `scripts/`.
@@ -85,6 +89,11 @@ client ./bin/client -addr 192.168.10.100 -port 443 -c 10
 client ./bin/client -addr 192.168.10.100 -port 443 -ChangePort
 ```
 
+1. Завершение процесов и удаление логов:
+```bash
+./scripts/stop.sh
+```
+
 ### Альтернативный запуск (вместо `scripts/run.sh`)
 
 Если вам требуется более тонкая настройка, компоненты можно развернуть вручную в отдельных терминалах:
@@ -100,16 +109,16 @@ python3 controler/run_controler.py -t 40
 ```
 
 3. Запустите серверы внутри консоли Mininet:
-```text
-mininet> server1 ./bin/server -id 3 &
-mininet> server2 ./bin/server -id 4 &
+```mininet> 
+server1 ./bin/server -id 3 &
+server2 ./bin/server -id 4 &
 ```
 
 ## Пример OpenFlow-правил
 
 При поступлении трафика, например от клиентов:
-```text
-mininet> client ./bin/client -addr 192.168.10.100 -port 443 -c 10
+```mininet> 
+client ./bin/client -addr 192.168.10.100 -port 443 -c 10
 ```
 Контроллер устанавливает правила для DNAT (клиент -> сервер) и SNAT (сервер -> клиент).
 
@@ -146,6 +155,7 @@ pytest controler/test_parser.py -v
 
 Стандарный диолог между сервером и клиентом выглядит так:
 
+```
 С: Hello! Who are you?
 S: Hello! I am Server №1. Who are you?
 С: Good. I am Aatur.
@@ -173,7 +183,8 @@ S: pong
 С: gg
 S: Well played. You did 8 ping pong.
 С: bye
-S: Bye Aatur!
+S: Bye Aatur!git push
+```
 
 ## Анализ ограничений
 
